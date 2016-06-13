@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Calls list</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="next-call col-md-6">
+            <h2>Next call</h2>
+            <table id='next-call-table' class="table table-striped table-bordered table-hover"></table>
+        </div>
+        <div class="col-md-6">
+            <div class="add-call">
+                <h2>Add call</h2>
+                <form action="#" id="add-call">
+                    <div class="form-group">
+                        <input type="text" class="name form-control" data-type="string" placeholder="Name" required>
+                        <div class="error">error</div>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="number form-control" placeholder="Phone number" required>
+                        <div class="error">error</div>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="time form-control" data-type="number" placeholder="Time" required>
+                        <div class="error">error</div>
+                    </div>
+                    <input type="submit" value="+" id="add-btn">
+                    <label for="add-btn" class="control-label">add</label>
+                </form>
+            </div>
+            <table class="calls table table-striped table-bordered table-hover">
+                <thead>
+                    <tr class="success">
+                        <th class="name" data-type="string">Name</th>
+                        <th class="number">Phone number</th>
+                        <th class="time" data-type="number">Time</th>
+                        <th class="delete"></th>
+                        <th class="check-box"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <div class="btn-group">
+                <a href="#" class="btn btn-success all">All</a>
+                <a href="#" class="btn btn-success next">Next</a>
+                <a href="#" class="btn btn-success finished">Finished</a>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

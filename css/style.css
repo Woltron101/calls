@@ -1,0 +1,97 @@
+    .add-call {
+        border: 1px solid #ccc;
+        margin-top: 50px;
+        position: relative;
+        padding: 20px;
+    }
+    
+    .add-call:after {
+        content: "";
+        display: block;
+        clear: both;
+    }
+    
+    .add-call h2 {
+        font-size: 14px;
+        font-weight: bold;
+        top: -18px;
+        background-color: #fff;
+        margin: 0;
+        position: absolute;
+        padding: 10px;
+    }
+    
+    .add-call .form-group {
+        width: 33.3%;
+        float: left;
+        padding: 5px;
+    }
+    
+    .add-call input[type="submit"] {
+        float: right;
+        margin-top: 10px;
+    }
+    
+    .add-call label {
+        float: right;
+        margin: 13px 10px 0 0;
+    }
+    
+    .add-call input[type="submit"]::before {
+        content: "add";
+        display: block;
+    }
+    
+    .calls {
+        margin-top: 30px;
+    }
+    
+    .calls th {
+        padding: 10px 36px;
+    }
+    
+    .error {
+        display: none;
+        color: red;
+    }
+    
+    .error.active {
+        display: block;
+    }
+    
+    th.name,
+    th.time {
+        position: relative;
+    }
+    
+    th.name:after,
+    th.time:after {
+        content: '';
+        position: absolute;
+        bottom: 55%;
+        right: 5px;
+        border: 5px solid;
+        border-color: transparent;
+        border-bottom-color: black;
+    }
+    
+    th.name:before,
+    th.time:before {
+        content: '';
+        position: absolute;
+        top: 55%;
+        right: 5px;
+        border: 5px solid;
+        border-color: transparent;
+        border-top-color: black;
+    }
+    
+    .btn-group {
+        width: 175px;
+        margin: 10px auto;
+        display: block;
+    }
+    
+    #next-call-table tr {
+        display: table-row !important;
+    }
