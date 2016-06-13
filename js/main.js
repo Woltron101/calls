@@ -1,12 +1,16 @@
-var callCount = 0;
+// where is check for dom ready?
+var callCount = 0; // we must live window object clean of custom variable as much as we can, instead use helper function to get count;
 $('#add-call').submit(function(event) {
     event.preventDefault();
-    var name = $('input.name').val();
+    var name = $('input.name').val() || '';// we should set default data in case when $('input.name') can be removed from html
     var number = $('input.number').val();
     var time = $('input.time').val();
     var nameValid = false;
     var numberValid = false;
     var timeValid = false;
+
+    // it's better to use helper functions instead to put long logick on single submit handler, 
+    // for example move code below to checkNameField function and call this function checkNameField()
 
     if (name.length <= 30) {
         nameValid = true;
@@ -17,8 +21,12 @@ $('#add-call').submit(function(event) {
         $('input.name+.error').addClass('active');
     }
 
-    if ((/^[+][(]?[0-9]{3}[)]?[\s]?[0-9]{3}[-\s]?[0-9]{3}[-\s]?[0-9]{3}$/i).test(number) || (/^[0]{2}[\s]?[(]?[0-9]{3}[)]?[\s]?[0-9]{3}[-\s]?[0-9]{3}[-\s]?[0-9]{3}$/i).test(number)) {
+    // the same problem move code below to helper function
+    if ((/^[+][(]?[0-9]{3}[)]?[\s]?[0-9]{3}[-\s]?[0-9]{3}[-\s]?[0-9]{3}$/i).test(number) 
+        || (/^[0]{2}[\s]?[(]?[0-9]{3}[)]?[\s]?[0-9]{3}[-\s]?[0-9]{3}[-\s]?[0-9]{3}$/i).test(number)) { // you must use only one regular pattern  
+
         numberValid = true;
+        // warning, you use same logick as in the line 17, you should avoid duplication of code, move this to some helper function
         if ($('input.number+.error.active')) {
             $('input.number+.error').removeClass('active');
         }
@@ -29,7 +37,7 @@ $('#add-call').submit(function(event) {
         if (number.indexOf('(')) {
             number = number.replace('(', ' ');
         }
-        if (number.indexOf(') ')) {
+        if (number.indexOf(') ')) { // its better remove all spaces ' ' on the beggining and it's check will be unnesesary
             number = number.replace(') ', ' ');
         }
         if (number.indexOf(')')) {
@@ -40,22 +48,27 @@ $('#add-call').submit(function(event) {
         }
         numberArr = number.split('');
 
-        function addSpace(index) {
-            if (numberArr[index] != ' ') {
+        function addSpace(index) { // move helper away from submit handler
+            if (numberArr[index] != ' ') { // read comment on line 40 and you will not need this check/
                 numberArr.splice(index, 0, " ");
             }
         }
+        // its better to do all this formats inside the formatNumber func
         addSpace(2);
         addSpace(6);
         addSpace(10);
         addSpace(14);
         number = numberArr.join('');
+
     } else {
         $('input.number+.error').addClass('active');
     }
 
-    if ((/^[0]{1}\d[:]{1}[0-6]{1}\d$/i).test(time) || (/^[1]{1}\d[:]{1}[0-6]{1}\d$/i).test(time) || (/^[2]{1}[0-4]{1}[:]{1}[0-6]{1}\d$/i).test(time)) {
-        timeValid = true;
+    if ((/^[0]{1}\d[:]{1}[0-6]{1}\d$/i).test(time) || 
+        (/^[1]{1}\d[:]{1}[0-6]{1}\d$/i).test(time) || 
+        (/^[2]{1}[0-4]{1}[:]{1}[0-6]{1}\d$/i).test(time)) { // you must use only one regular expression
+
+        timeValid = true;// code dublication again
         if ($('input.time+.error.active')) {
             $('input.time+.error').removeClass('active');
         }
@@ -63,11 +76,19 @@ $('#add-call').submit(function(event) {
     } else {
         $('input.time+.error').addClass('active');
     }
-    if (nameValid == true && numberValid == true && timeValid == true) {
-        // $("#add-call").unbind('submit').submit();
+    if (nameValid  && numberValid  && timeValid) { // chek for timeValid == true and timeValid is the same
+        // $("#add-call").unbind('submit').submit(); // all trash should be deleted
         callCount = $('.calls tbody tr').length;
-        var rowId = "row_" + callCount;
-        var tr = $('<tr id="' + rowId + '"><td class="name">' + name + '</td><td class="number">' + number + '</td><td class="time">' + time + '</td><td class="delete"><a href="#">delete</a></td><td class="check"><form action=""><input type="checkbox"></form></td></tr>');
+        var rowId = "row_" + callCount; // all var's should be declared on the top level of function
+        // it better to write long expression of html in readable view
+        var tr = $('<tr id="' + rowId + '"> \
+                <td class="name">' + name + '</td> \
+                <td class="number">' + number + '</td> \
+                <td class="time">' + time + '</td> \
+                <td class="delete"><a href="#">delete</a></td> \
+                <td class="check"> \
+                    <form action=""><input type="checkbox"></form> \
+                </td></tr>');
         tr.appendTo('.calls tbody');
         $('#add-call')[0].reset();
         $('input.name').focus();
@@ -87,6 +108,7 @@ $('#add-call').submit(function(event) {
 for (i = 0; localStorage.getItem('row_' + i) != null; i++) {
     console.log(('row_' + i))
     localKey = JSON.parse(localStorage.getItem('row_' + i));
+    // the same problem as in 83 line
     $('<tr id="row_' + i + '"><td class="name">' + localKey.name + '</td><td class="number">' + localKey.number + '</td><td class="time">' + localKey.time + '</td><td class="delete"><a href="#">delete</a></td><td class="check"><form action=""><input type="checkbox"></form></td></tr>').appendTo('.calls tbody');
 }
 
@@ -126,7 +148,7 @@ function sortGrid(colNum, type) {
 
     grid.appendChild(tbody);
 }
-$('td.delete a').on('click', function() {
+$('td.delete a').on('click', function(event) {
     event.preventDefault();
     var removeRow = $(this).closest('tr');
     removeRow.remove();
@@ -146,7 +168,7 @@ function callsTimeCheck() {
             $(this).closest('tr').find('input').attr('checked', 'checked');
         }
     });
-    var arr = []
+    var arr = []; // please install code linter to omit mistakes
 
     $('.calls td.time').each(function(index, el) {
         if ($(this).text().slice(0, 2) > date.getHours() || $(this).text().slice(0, 2) == date.getHours() && $(this).text().slice(3) >= date.getMinutes()) {
