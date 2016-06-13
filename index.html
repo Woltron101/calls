@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Calls list</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!--it's better store all third party plugins localy for example using bower-->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -21,14 +22,17 @@
                     <div class="form-group">
                         <input type="text" class="name form-control" data-type="string" placeholder="Name" required>
                         <div class="error">error</div>
+                        <!--what does error mean? Please inform user what exacly happen for example: Name should have only letter-->
                     </div>
                     <div class="form-group">
                         <input type="text" class="number form-control" placeholder="Phone number" required>
                         <div class="error">error</div>
+                        <!--same problem, dosnt informative error-->
                     </div>
                     <div class="form-group">
                         <input type="text" class="time form-control" data-type="number" placeholder="Time" required>
                         <div class="error">error</div>
+                        <!--same problem, dosnt informative error-->
                     </div>
                     <input type="submit" value="+" id="add-btn">
                     <label for="add-btn" class="control-label">add</label>
@@ -55,6 +59,7 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <!--the same problem as with bootstrap-->
     <script src="js/main.js"></script>
 </body>
 
