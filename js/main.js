@@ -110,16 +110,16 @@ $(document).ready(function() {
     grid.onclick = function(e) {
         var eClass = e.target.getAttribute('class');
         if (e.target.tagName != 'TH') return;
-        if (e.target.getAttribute('class') == 'name') {
+        if (eClass == 'name') {
             sortGrid(e.target.cellIndex, e.target.getAttribute('data-type'));
             $('th.name').addClass('sort');
-        } else if (e.target.getAttribute('class') == 'name sort') {
+        } else if (eClass == 'name sort') {
             $('th.name.sort').removeClass('sort');
             sortGrid(0, 'string sort');
-        } else if (e.target.getAttribute('class') == 'time') {
+        } else if (eClass == 'time') {
             sortGrid(e.target.cellIndex, e.target.getAttribute('data-type'));
             $('th.time').addClass('sort');
-        } else if (e.target.getAttribute('class') == 'time sort') {
+        } else if (eClass == 'time sort') {
             sortGrid(2, 'number sort');
             $('th.time').removeClass('sort');
 
