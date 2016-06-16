@@ -53,6 +53,7 @@
     .error {
         display: none;
         color: red;
+        font-size: 12px;
     }
     
     .error.active {
@@ -62,6 +63,7 @@
     th.name,
     th.time {
         position: relative;
+        cursor: pointer;
     }
     
     th.name:after,
