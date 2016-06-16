@@ -9,6 +9,12 @@ $(document).ready(function() {
         var numberValid = false;
         var timeValid = false;
         var rowId = "row_" + callCount;
+
+        // please move this all functions decalarations outside of submit handler;
+        // and in this plase you need only fire them;
+        // checkName();
+        // checkNumber(); etc.
+
         var checkName = function() {
             if (name.length <= 30) {
                 nameValid = true;
@@ -85,9 +91,10 @@ $(document).ready(function() {
                 localStorage.setItem(rowId, JSON.stringify(callsObj.rowId));
                 addToCallsTable();
             }
-        }()
+        }() // function better fire like separetly not immidetly, and also missed semicolon;
     });
 
+    // block bellow should be on some functions
     for (i = 0; localStorage.getItem('row_' + i) != null; i++) {
         localKey = JSON.parse(localStorage.getItem('row_' + i));
         $('<tr id="row_' + i + '"><td class="name">' + localKey.name + '</td> \
@@ -108,14 +115,19 @@ $(document).ready(function() {
 
     grid.onclick = function(e) {
         var eClass = e.target.getAttribute('class');
+        // please add line breaks for better reading this block
         if (e.target.tagName != 'TH') return;
+
         if (e.target.getAttribute('class') == 'name') {
+
             sortGrid(e.target.cellIndex, e.target.getAttribute('data-type'));
             $('th.name').addClass('sort');
+
         } else if (e.target.getAttribute('class') == 'name sort') {
             $('th.name.sort').removeClass('sort');
             sortGrid(0, 'string sort');
         } else if (e.target.getAttribute('class') == 'time') {
+            // code dublication like in 123-124 line you should avoid that;
             sortGrid(e.target.cellIndex, e.target.getAttribute('data-type'));
             $('th.time').addClass('sort');
         } else if (e.target.getAttribute('class') == 'time sort') {
@@ -127,9 +139,9 @@ $(document).ready(function() {
 
     function sortGrid(colNum, type) {
 
-        var tbody = $('table.calls tbody')[0];
-        var rowsArray = [].slice.call(tbody.rows);
-        var compare;
+        var tbody = $('table.calls tbody')[0], // you can use only one var for best practise;
+            rowsArray = [].slice.call(tbody.rows),
+            compare;
 
         switch (type) {
             case 'number':
@@ -138,6 +150,7 @@ $(document).ready(function() {
                 };
                 break;
             case 'number sort':
+                // code dublication again :|
                 compare = function(rowA, rowB) {
                     return rowA.cells[colNum].innerHTML.slice(0, 2) + rowA.cells[colNum].innerHTML.slice(3) > rowB.cells[colNum].innerHTML.slice(0, 2) + rowB.cells[colNum].innerHTML.slice(3) ? -1 : 1;
                 };
@@ -148,6 +161,7 @@ $(document).ready(function() {
                 };
                 break;
             case 'string sort':
+                // code dublication again :|, don't do that anymore!
                 compare = function(rowA, rowB) {
                     return rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML ? -1 : 1;
                 };
@@ -162,29 +176,40 @@ $(document).ready(function() {
 
         grid.appendChild(tbody);
     }
+
     $('td.delete a').on('click', function(event) {
         event.preventDefault();
         var removeRow = $(this).closest('tr');
         removeRow.remove();
         callsTimeCheck();
     });
-
+    // why 3 line breaks below? You should use one code style guide for entire file;
 
 
     function callsTimeCheck() {
+        // for best practise better declare all vars on the beginning of the function;
         var date = new Date();
+        var arr = [];
+
         $('.calls td.time').each(function(index, el) {
             if ($(this).text().slice(0, 2) < date.getHours()) {
                 $(this).closest('tr').find('input').attr('checked', 'checked');
             }
             if ($(this).text().slice(0, 2) == date.getHours() && $(this).text().slice(3) < date.getMinutes()) {
+                // and as I see you like to copy the code
                 $(this).closest('tr').find('input').attr('checked', 'checked');
             }
         });
-        var arr = []
+        
 
         $('.calls td.time').each(function(index, el) {
-            if ($(this).text().slice(0, 2) > date.getHours() || $(this).text().slice(0, 2) == date.getHours() && $(this).text().slice(3) >= date.getMinutes()) {
+            var hours = $(this).text().slice(0, 2),
+                minutes = $(this).text().slice(3);
+
+            // please use variables to write shorter code below;   
+            if ($(this).text().slice(0, 2) > date.getHours() ||
+                 $(this).text().slice(0, 2) == date.getHours() &&
+                 $(this).text().slice(3) >= date.getMinutes()) {
                 arr[arr.length] = $(this).text().slice(0, 2) + $(this).text().slice(3);
             }
         })
@@ -192,7 +217,6 @@ $(document).ready(function() {
         for (i = 1; i < arr.length - 1; i++) {
             if (arr[i] < min) {
                 min = arr[i];
-
             }
         }
 
@@ -209,6 +233,7 @@ $(document).ready(function() {
     setInterval(function() {
         callsTimeCheck();
     }, 60000);
+    // you should insert one line break after every handlers;
     $('.all').on('click', function(event) {
         event.preventDefault();
         $('tr').removeClass('hidden')
@@ -222,7 +247,7 @@ $(document).ready(function() {
         event.preventDefault();
         $('tr').removeClass('hidden');
         $('input[type="checkbox"]').each(function(index, el) {
-            if ($(this).attr('checked') != 'checked') {
+            if (!$(this).attr('checked')) { // you can write shorter $(this).attr('checked') return's boolean;
                 $(this).closest('tr').addClass('hidden');
                 $('input[checked="checked"]').closest('tr').removeClass('hidden');
             }
