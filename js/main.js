@@ -4,7 +4,9 @@ $(document).ready(function () {
 		nameValid = false,
 		numberValid = false,
 		timeValid = false,
-		rowId = "row_" + callCount;
+		rowId = "row_" + callCount,
+		callsArr = JSON.parse(localStorage.getItem('callsArr'));
+
 	$('#add-call').submit(function (event) {
 		event.preventDefault();
 		name = $('input.name').val() || '';
@@ -87,27 +89,26 @@ $(document).ready(function () {
 			$('input.name').focus();
 			callsTimeCheck();
 			rowId = "row_" + callCount;
-			var callsObj = {
-				rowId: {
-					'name': name,
-					'number': number,
-					'time': time
-				}
-			};
-			localStorage.setItem(rowId, JSON.stringify(callsObj.rowId));
-			addToCallsTable(name, number, time);
-			nameValid = false,
-				numberValid = false,
-				timeValid = false;
-		}
-	};
+			callsArr[callCount] = {
+				'name': name,
+				'number': number,
+				'time': time
+			}
+		};
+		localStorage.setItem('callsArr', JSON.stringify(callsArr));
+		addToCallsTable(name, number, time);
+		nameValid = false,
+			numberValid = false,
+			timeValid = false;
+	}
+
 
 	function paseLocalStorage() {
-		for (i = 0; localStorage.getItem('row_' + i) != null; i++) {
-			localKey = JSON.parse(localStorage.getItem('row_' + i));
-			$('<tr id="row_' + i + '"><td class="name">' + localKey.name + '</td> \
-			<td class="number">' + localKey.number + '</td> \
-			<td class = "time">' + localKey.time + '</td> \
+		for (i = 0; i < JSON.parse(localStorage.getItem('callsArr')).length; i++) {
+			callsArr = JSON.parse(localStorage.getItem('callsArr'));
+			$('<tr id="row_' + i + '"><td class="name">' + callsArr[i].name + '</td> \
+			<td class="number">' + callsArr[i].number + '</td> \
+			<td class = "time">' + callsArr[i].time + '</td> \
 			<td class = "delete"><a href = "#"> delete </a></td> \
 			<td class = "check"> <form action = "#"> <input type = "checkbox" disabled> </form></td></tr>')
 				.appendTo('.calls tbody');
@@ -129,7 +130,7 @@ $(document).ready(function () {
 		} else if (eClass == 'name sort') {
 			sortGrid(0, 'string sort');
 		} else if (eClass == 'time') {
-			sortGrid(0, 'number');
+			sortGrid(2, 'number');
 		} else if (eClass == 'time sort') {
 			sortGrid(2, 'number sort');
 		}
@@ -139,31 +140,27 @@ $(document).ready(function () {
 		var tbody = $('table.calls tbody')[0];
 		var rowsArray = [].slice.call(tbody.rows);
 		var compare;
-		switch (type) {
-		case 'number':
-			$('th.time').addClass('sort');
-			compare = function (rowA, rowB) {
-				return rowA.cells[colNum].innerHTML.slice(0, 2) + rowA.cells[colNum].innerHTML.slice(3) > rowB.cells[colNum].innerHTML.slice(0, 2) + rowB.cells[colNum].innerHTML.slice(3) ? 1 : -1;
-			};
-			break;
-		case 'number sort':
-			$('th.time').removeClass('sort');
-			compare = function (rowA, rowB) {
-				return rowA.cells[colNum].innerHTML.slice(0, 2) + rowA.cells[colNum].innerHTML.slice(3) > rowB.cells[colNum].innerHTML.slice(0, 2) + rowB.cells[colNum].innerHTML.slice(3) ? -1 : 1;
-			};
-			break;
-		case 'string':
-			$('th.name').addClass('sort');
-			compare = function (rowA, rowB) {
-				return rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML ? 1 : -1;
-			};
-			break;
-		case 'string sort':
-			$('th.name.sort').removeClass('sort');
-			compare = function (rowA, rowB) {
-				return rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML ? -1 : 1;
-			};
-			break;
+		var compare = function (rowA, rowB) {
+			var timeSort = rowA.cells[colNum].innerHTML.slice(0, 2) + rowA.cells[colNum].innerHTML.slice(3) > rowB.cells[colNum].innerHTML.slice(0, 2) + rowB.cells[colNum].innerHTML.slice(3);
+			var nameSort = rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML;
+			switch (type) {
+			case 'number':
+				$('th.time').addClass('sort');
+				return timeSort ? 1 : -1;
+				break;
+			case 'number sort':
+				$('th.time').removeClass('sort');
+				return timeSort ? -1 : 1;
+				break;
+			case 'string':
+				$('th.name').addClass('sort');
+				return nameSort ? 1 : -1;
+				break;
+			case 'string sort':
+				$('th.name.sort').removeClass('sort');
+				return nameSort ? -1 : 1;
+				break;
+			}
 		}
 		rowsArray.sort(compare);
 		grid.removeChild(tbody);
@@ -192,14 +189,15 @@ $(document).ready(function () {
 			arr = []
 		$('.calls td.time').each(function (index, el) {
 			var hoursCheck = $(this).text().slice(0, 2) < dateHours;
-			if (hoursCheck || (hoursCheck && $(this).text().slice(3) < dateMinutes)) {
+			if (hoursCheck || ($(this).text().slice(0, 2) == dateHours && $(this).text().slice(3) < dateMinutes)) {
 				$(this).closest('tr').find('input').attr('checked', 'checked');
+			} else {
 				arr[arr.length] = $(this).text().slice(0, 2) + $(this).text().slice(3);
 			}
 		});
 
 		min = arr[0];
-		for (i = 1; i < arr.length - 1; i++) {
+		for (i = 1; i <= arr.length - 1; i++) {
 			if (arr[i] < min) {
 				min = arr[i];
 			}
