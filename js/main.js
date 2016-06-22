@@ -1,11 +1,11 @@
 $(document).ready(function () {
-	var name, number, time, rowId, grid;
 	var callCount = 0,
 		nameValid = false,
 		numberValid = false,
 		timeValid = false,
 		rowId = "row_" + callCount,
-		callsArr = JSON.parse(localStorage.getItem('callsArr'));
+		callsArr = JSON.parse(localStorage.getItem('callsArr')) || [],
+		name, number, time, rowId, grid;
 
 	$('#add-call').submit(function (event) {
 		event.preventDefault();
@@ -13,10 +13,10 @@ $(document).ready(function () {
 		number = $('input.number').val() || '';
 		time = $('input.time').val() || '';
 		checkName(name);
-		checkNumber(number);
 		number = checkNumber(number);
 		checkTime(time);
 		addToLocalStorage(name, number, time);
+		callsTimeCheck()
 	});
 
 	function checkName(name) {
@@ -29,41 +29,30 @@ $(document).ready(function () {
 	};
 
 	function checkNumber(number) {
-		if ((/^([0]{2}[\s]?[(]?[0-9]{3}[)]?[\s]?[0-9]{3}[-\s]?[0-9]{3}[-\s]?[0-9]{3})|([+][\s]?[(]?[0-9]{3}[)]?[\s]?[0-9]{3}[-\s]?[0-9]{3}[-\s]?[0-9]{3})$/i).test(number)) {
-			var numberArr;
+		if ((/^([0]{2}|[+])[\s]?[(]?[0-9]{3}[)]?[\s]?[0-9]{3}[-\s]?[0-9]{3}[-\s]?[0-9]{3}$/i).test(number)) {
 			numberValid = true;
 			inputIsValid('number');
-			number = changeSymbol(number, '+', '00');
-			number = changeSymbol(number, '(', '');
-			number = changeSymbol(number, ')', '');
-			number = changeSymbol(number, '-', '');
-			numberArr = number.split('');
-			addSpace(numberArr, 2);
-			addSpace(numberArr, 6);
-			addSpace(numberArr, 10);
-			addSpace(numberArr, 14);
-			return number = numberArr.join('');
+			number = number.replace('+', '00');
+			number = number.replace(/(\-|\(|\)|\s)/g, '');
+			number = parseNumber(number);
+			return number;
 		} else {
 			$('input.number+.error').addClass('active');
 		}
 	};
 
-	function changeSymbol(number, searchSym, changeSym) {
-		if (number.indexOf(searchSym) >= 0) {
-			return number.replace(searchSym, changeSym);
-		} else {
-			return number;
-		}
+	function parseNumber(number) {
+		var numberArr = number.split('');
+		numberArr.splice(2, 0, ' ');
+		numberArr.splice(6, 0, ' ');
+		numberArr.splice(10, 0, ' ');
+		numberArr.splice(14, 0, ' ');
+		return number = numberArr.join('');
 	}
 
-	function addSpace(numberArr, index) {
-		if (numberArr[index] != ' ') {
-			numberArr.splice(index, 0, " ");
-		}
-	}
 
 	function checkTime(time) {
-		if ((/^([0]{1}\d[:]{1}[0-5]{1}\d)|([1]{1}\d[:]{1}[0-5]{1}\d)|([2]{1}[0-4]{1}[:]{1}[0-5]{1}\d)$/i).test(time)) {
+		if ((/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/i).test(time)) {
 			timeValid = true;
 			inputIsValid('time');
 		} else {
@@ -94,9 +83,10 @@ $(document).ready(function () {
 				'number': number,
 				'time': time
 			}
+			localStorage.setItem('callsArr', JSON.stringify(callsArr));
+			addToCallsTable(name, number, time);
 		};
-		localStorage.setItem('callsArr', JSON.stringify(callsArr));
-		addToCallsTable(name, number, time);
+
 		nameValid = false,
 			numberValid = false,
 			timeValid = false;
@@ -104,14 +94,17 @@ $(document).ready(function () {
 
 
 	function paseLocalStorage() {
-		for (i = 0; i < JSON.parse(localStorage.getItem('callsArr')).length; i++) {
-			callsArr = JSON.parse(localStorage.getItem('callsArr'));
-			$('<tr id="row_' + i + '"><td class="name">' + callsArr[i].name + '</td> \
+		if (localStorage.getItem('callsArr')) {
+			for (i = 0; i < JSON.parse(localStorage.getItem('callsArr')).length; i++) {
+				callsArr = JSON.parse(localStorage.getItem('callsArr'));
+				$('<tr id="row_' + i + '"><td class="name">' + callsArr[i].name + '</td> \
 			<td class="number">' + callsArr[i].number + '</td> \
 			<td class = "time">' + callsArr[i].time + '</td> \
 			<td class = "delete"><a href = "#"> delete </a></td> \
 			<td class = "check"> <form action = "#"> <input type = "checkbox" disabled> </form></td></tr>')
-				.appendTo('.calls tbody');
+					.appendTo('.calls tbody');
+			}
+
 		}
 	}
 
@@ -137,31 +130,31 @@ $(document).ready(function () {
 	};
 
 	function sortGrid(colNum, type) {
-		var tbody = $('table.calls tbody')[0];
-		var rowsArray = [].slice.call(tbody.rows);
-		var compare;
-		var compare = function (rowA, rowB) {
-			var timeSort = rowA.cells[colNum].innerHTML.slice(0, 2) + rowA.cells[colNum].innerHTML.slice(3) > rowB.cells[colNum].innerHTML.slice(0, 2) + rowB.cells[colNum].innerHTML.slice(3);
-			var nameSort = rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML;
-			switch (type) {
-			case 'number':
-				$('th.time').addClass('sort');
-				return timeSort ? 1 : -1;
-				break;
-			case 'number sort':
-				$('th.time').removeClass('sort');
-				return timeSort ? -1 : 1;
-				break;
-			case 'string':
-				$('th.name').addClass('sort');
-				return nameSort ? 1 : -1;
-				break;
-			case 'string sort':
-				$('th.name.sort').removeClass('sort');
-				return nameSort ? -1 : 1;
-				break;
+		var tbody = $('table.calls tbody')[0],
+			rowsArray = [].slice.call(tbody.rows),
+			compare,
+			compare = function (rowA, rowB) {
+				var timeSort = rowA.cells[colNum].innerHTML.slice(0, 2) + rowA.cells[colNum].innerHTML.slice(3) > rowB.cells[colNum].innerHTML.slice(0, 2) + rowB.cells[colNum].innerHTML.slice(3);
+				var nameSort = rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML;
+				switch (type) {
+				case 'number':
+					$('th.time').addClass('sort');
+					return timeSort ? 1 : -1;
+					break;
+				case 'number sort':
+					$('th.time').removeClass('sort');
+					return timeSort ? -1 : 1;
+					break;
+				case 'string':
+					$('th.name').addClass('sort');
+					return nameSort ? 1 : -1;
+					break;
+				case 'string sort':
+					$('th.name.sort').removeClass('sort');
+					return nameSort ? -1 : 1;
+					break;
+				}
 			}
-		}
 		rowsArray.sort(compare);
 		grid.removeChild(tbody);
 
@@ -182,11 +175,11 @@ $(document).ready(function () {
 	};
 
 	function callsTimeCheck() {
-		var min;
 		var date = new Date(),
 			dateHours = date.getHours(),
 			dateMinutes = date.getMinutes(),
-			arr = []
+			arr = [],
+			min;
 		$('.calls td.time').each(function (index, el) {
 			var hoursCheck = $(this).text().slice(0, 2) < dateHours;
 			if (hoursCheck || ($(this).text().slice(0, 2) == dateHours && $(this).text().slice(3) < dateMinutes)) {
@@ -202,15 +195,17 @@ $(document).ready(function () {
 				min = arr[i];
 			}
 		}
+		if (min) {
 
-		min = min.slice(0, 2) + ":" + min.slice(2);
-		$('.calls td.time').each(function (index, el) {
-			if ($(this).text() == min) {
-				$('.next-call table tr').remove();
-				$(this).closest('tr').clone().appendTo('.next-call table');
-				$('.next-call table .delete, .next-call table .check').remove();
-			}
-		})
+			min = min.slice(0, 2) + ":" + min.slice(2);
+			$('.calls td.time').each(function (index, el) {
+				if ($(this).text() == min) {
+					$('.next-call table tr').remove();
+					$(this).closest('tr').clone().appendTo('.next-call table');
+					$('.next-call table .delete, .next-call table .check').remove();
+				}
+			})
+		}
 	};
 	paseLocalStorage();
 	removeRow();
