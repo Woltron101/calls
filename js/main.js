@@ -5,18 +5,20 @@ $(document).ready(function () {
 		timeValid = false,
 		rowId = "row_" + callCount,
 		callsArr = JSON.parse(localStorage.getItem('callsArr')) || [],
-		name, number, time, rowId, grid;
+		name, 
+		number, time, rowId, grid; // new vars should start in new line;
 
 	$('#add-call').submit(function (event) {
 		event.preventDefault();
 		name = $('input.name').val() || '';
 		number = $('input.number').val() || '';
 		time = $('input.time').val() || '';
+		
 		checkName(name);
 		number = checkNumber(number);
 		checkTime(time);
 		addToLocalStorage(name, number, time);
-		callsTimeCheck()
+		callsTimeCheck()// missed semicolon please use eslint for check js grammar;
 	});
 
 	function checkName(name) {
@@ -137,22 +139,22 @@ $(document).ready(function () {
 				var timeSort = rowA.cells[colNum].innerHTML.slice(0, 2) + rowA.cells[colNum].innerHTML.slice(3) > rowB.cells[colNum].innerHTML.slice(0, 2) + rowB.cells[colNum].innerHTML.slice(3);
 				var nameSort = rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML;
 				switch (type) {
-				case 'number':
-					$('th.time').addClass('sort');
-					return timeSort ? 1 : -1;
-					break;
-				case 'number sort':
-					$('th.time').removeClass('sort');
-					return timeSort ? -1 : 1;
-					break;
-				case 'string':
-					$('th.name').addClass('sort');
-					return nameSort ? 1 : -1;
-					break;
-				case 'string sort':
-					$('th.name.sort').removeClass('sort');
-					return nameSort ? -1 : 1;
-					break;
+					case 'number':
+						$('th.time').addClass('sort');
+						return timeSort ? 1 : -1;
+						break; // you can'not use break after return statement; 
+					case 'number sort':
+						$('th.time').removeClass('sort');
+						return timeSort ? -1 : 1;
+						break;
+					case 'string':
+						$('th.name').addClass('sort');
+						return nameSort ? 1 : -1;
+						break;
+					case 'string sort':
+						$('th.name.sort').removeClass('sort');
+						return nameSort ? -1 : 1;
+						break;
 				}
 			}
 		rowsArray.sort(compare);
@@ -180,21 +182,28 @@ $(document).ready(function () {
 			dateMinutes = date.getMinutes(),
 			arr = [],
 			min;
+
+		// please create helper function with code below and fire on this place like you did on the submit handler on line 10-20;
 		$('.calls td.time').each(function (index, el) {
-			var hoursCheck = $(this).text().slice(0, 2) < dateHours;
+			var hoursCheck = $(this).text().slice(0, 2) < dateHours,
+				contactHours = $(this).text().slice(0, 2),
+				contactMinutes = $(this).text().slice(3);
+
+			// it's better to use variables for contact hours and minutes;
 			if (hoursCheck || ($(this).text().slice(0, 2) == dateHours && $(this).text().slice(3) < dateMinutes)) {
 				$(this).closest('tr').find('input').attr('checked', 'checked');
 			} else {
 				arr[arr.length] = $(this).text().slice(0, 2) + $(this).text().slice(3);
 			}
 		});
-
+		// please create helper function with code below and fire on this place like you did on the submit handler on line 10-20;
 		min = arr[0];
 		for (i = 1; i <= arr.length - 1; i++) {
 			if (arr[i] < min) {
 				min = arr[i];
 			}
 		}
+		// please create helper function with code below and fire on this place like you did on the submit handler on line 10-20;
 		if (min) {
 
 			min = min.slice(0, 2) + ":" + min.slice(2);
@@ -215,6 +224,7 @@ $(document).ready(function () {
 	}, 60000);
 
 	$('.all, .next, .finished').click(function (event) {
+		// please create helper function with code below and fire on this place like you did on the submit handler on line 10-20;
 		event.preventDefault();
 		$('tr').removeClass('hidden');
 		if ($(this)[0] == $('.next')[0]) {
@@ -223,7 +233,7 @@ $(document).ready(function () {
 			$('input[type="checkbox"]').each(function (index, el) {
 				if (!$(this).attr('checked')) {
 					$(this).closest('tr').addClass('hidden');
-					$('input[checked="checked"]').closest('tr').removeClass('hidden');
+					$('input[checked="checked"]').closest('tr').removeClass('hidden'); // almost same code as in 229 line you can create helper toogle function
 				}
 			})
 		}
