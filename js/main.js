@@ -5,7 +5,11 @@ $(document).ready(function () {
 		timeValid = false,
 		rowId = "row_" + callCount,
 		callsArr = JSON.parse(localStorage.getItem('callsArr')) || [],
-		name, number, time, rowId, grid;
+		name,
+		number,
+		time,
+		rowId,
+		grid;
 
 	$('#add-call').submit(function (event) {
 		event.preventDefault();
@@ -16,7 +20,7 @@ $(document).ready(function () {
 		number = checkNumber(number);
 		checkTime(time);
 		addToLocalStorage(name, number, time);
-		callsTimeCheck()
+		callsTimeCheck();
 	});
 
 	function checkName(name) {
@@ -92,7 +96,6 @@ $(document).ready(function () {
 			timeValid = false;
 	}
 
-
 	function paseLocalStorage() {
 		if (localStorage.getItem('callsArr')) {
 			for (i = 0; i < JSON.parse(localStorage.getItem('callsArr')).length; i++) {
@@ -113,6 +116,7 @@ $(document).ready(function () {
 			$('input.' + type + '+.error').removeClass('active');
 		}
 	};
+
 	grid = $('table.calls')[0];
 
 	grid.onclick = function (e) {
@@ -140,19 +144,15 @@ $(document).ready(function () {
 				case 'number':
 					$('th.time').addClass('sort');
 					return timeSort ? 1 : -1;
-					break;
 				case 'number sort':
 					$('th.time').removeClass('sort');
 					return timeSort ? -1 : 1;
-					break;
 				case 'string':
 					$('th.name').addClass('sort');
 					return nameSort ? 1 : -1;
-					break;
 				case 'string sort':
 					$('th.name.sort').removeClass('sort');
 					return nameSort ? -1 : 1;
-					break;
 				}
 			}
 		rowsArray.sort(compare);
@@ -175,11 +175,17 @@ $(document).ready(function () {
 	};
 
 	function callsTimeCheck() {
+		var arr = [],
+			min;
+		addAttrChecked(arr);
+		findNextCall(arr, min)
+
+	};
+
+	function addAttrChecked(arr) {
 		var date = new Date(),
 			dateHours = date.getHours(),
-			dateMinutes = date.getMinutes(),
-			arr = [],
-			min;
+			dateMinutes = date.getMinutes();
 		$('.calls td.time').each(function (index, el) {
 			var hoursCheck = $(this).text().slice(0, 2) < dateHours;
 			if (hoursCheck || ($(this).text().slice(0, 2) == dateHours && $(this).text().slice(3) < dateMinutes)) {
@@ -188,7 +194,9 @@ $(document).ready(function () {
 				arr[arr.length] = $(this).text().slice(0, 2) + $(this).text().slice(3);
 			}
 		});
+	}
 
+	function findNextCall(arr, min) {
 		min = arr[0];
 		for (i = 1; i <= arr.length - 1; i++) {
 			if (arr[i] < min) {
@@ -206,7 +214,8 @@ $(document).ready(function () {
 				}
 			})
 		}
-	};
+	}
+
 	paseLocalStorage();
 	removeRow();
 	callsTimeCheck();

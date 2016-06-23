@@ -20,21 +20,22 @@
                 <form action="#" id="add-call">
                     <div class="form-group">
                         <input type="text" class="name form-control" data-type="string" placeholder="Name" required>
-                        <div class="error">name max length of 30 characters</div>
+                        <div class="error">Contact name should be less than 30 characters</div>
                     </div>
                     <div class="form-group">
                         <input type="text" class="number form-control" placeholder="Phone number" required>
-                        <div class="error">Phone number +(999) 999 999 999 or 00999999999999 format</div>
+                        <div class="error">Phone number should be in +(999) 999 999 999 or 00999999999999 format</div>
                     </div>
                     <div class="form-group">
                         <input type="text" class="time form-control" data-type="number" placeholder="Time" required>
-                        <div class="error">time, in hh:mm format</div>
+                        <div class="error">Time should be in hh:mm format</div>
                     </div>
                     <input type="submit" value="+" id="add-btn">
                     <label for="add-btn" class="control-label">add</label>
                 </form>
             </div>
             <table class="calls table table-striped table-bordered table-hover">
+                <caption>Calls list</caption>
                 <thead>
                     <tr class="success">
                         <th class="name" data-type="string">Name</th>
